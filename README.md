@@ -24,7 +24,7 @@ Delete storage tables
 // 1. Create entity with attributes
 $entity = \Sinevia\Schemaless::createEntity([
     'Type' => 'Person',
-    'Title' => 'Milan',
+    'Title' => 'Peter Pan',
         ], [
     'FirstName' => 'Peter',
     'LastName' => 'Pan',
