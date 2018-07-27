@@ -4,6 +4,12 @@ Work in progress. Not stable in any way
 
 ## Install
 
+Using composer
+
+```php
+composer require sinevia/php-library-schemaless
+```
+
 Create storage tables
 
 ```php
