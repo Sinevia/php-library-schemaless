@@ -36,6 +36,10 @@ $entity = \Sinevia\Schemaless::createEntity([
         ], [
     'FirstName' => 'Peter',
     'LastName' => 'Pan',
+    'AddressLine1' => '23 Kings Way',
+    'AddressLine2' => 'Wolves Den',
+    'Postcode' => 'WWW 123 NET',
+    'Country' => 'WW',    
 ]);
 
 // 2. Check if successful
@@ -47,16 +51,16 @@ if (is_null($entity)) {
 var_dump(\Sinevia\Schemaless::getEntity($entity['Id']));
 
 // 4. Retrieve and display entity attributes
-var_dump(\Sinevia\Schemaless::getAttribute($entity['Id'],'FirstName'));
-var_dump(\Sinevia\Schemaless::getAttribute($entity['Id'],'LastName'));
+echo \Sinevia\Schemaless::getAttribute($entity['Id'],'AddressLine1');
+echo \Sinevia\Schemaless::getAttribute($entity['Id'],'AddressLine2');
 
 // 5. Update entity attributes
-\Sinevia\Schemaless::setAttribute($entity['Id'], 'FirstName', 'John');
-\Sinevia\Schemaless::setAttribute($entity['Id'], 'LastName', 'Smith');
+\Sinevia\Schemaless::setAttribute($entity['Id'], 'AddressLine1', '45 Queens Road');
+\Sinevia\Schemaless::setAttribute($entity['Id'], 'AddressLine2', 'Foxes Layer');
 
 // 6. Retrieve and display entity attributes
-var_dump(\Sinevia\Schemaless::getAttribute($entity['Id'],'FirstName'));
-var_dump(\Sinevia\Schemaless::getAttribute($entity['Id'],'LastName'));
+echo \Sinevia\Schemaless::getAttribute($entity['Id'],'AddressLine1');
+echo \Sinevia\Schemaless::getAttribute($entity['Id'],'AddressLine2');
    
 ```     
 
