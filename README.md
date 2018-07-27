@@ -76,7 +76,7 @@ The following schema is used for the database.
 | DeletedAt | DateTime         |
 | Udated At | DateTime         |
 
-| Field     |                  |
+| Attribute |                  |
 |-----------|------------------|
 | Id        | String, UniqueId |
 | EntityId  | String, UniqueId |
