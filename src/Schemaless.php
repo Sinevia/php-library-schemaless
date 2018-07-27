@@ -1,6 +1,6 @@
 <?php
 
-namespace Sinevia;
+namespace App;
 
 class Schemaless {
 
@@ -51,11 +51,11 @@ class Schemaless {
      * Creates the storage tables
      */
     public static function createTables() {
-        if (self::getTableEntity()->exists() == false) {
-            self::getTableEntity()->create(self::$tableEntitySchema);
+        if (static::getTableEntity()->exists() == false) {
+            static::getTableEntity()->create(static::$tableEntitySchema);
         }
-        if (self::getTableAttribute()->exists() == false) {
-            self::getTableAttribute()->create(self::$tableAttributeSchema);
+        if (static::getTableAttribute()->exists() == false) {
+            static::getTableAttribute()->create(static::$tableAttributeSchema);
         }
     }
     
@@ -63,11 +63,11 @@ class Schemaless {
      * Deletes the storage tables
      */
     public static function deleteTables() {
-        if (self::getTableEntity()->exists() == true) {
-            self::getTableEntity()->drop();
+        if (static::getTableEntity()->exists() == true) {
+            static::getTableEntity()->drop();
         }
-        if (self::getTableAttribute()->exists() == true) {
-            self::getTableAttribute()->drop();
+        if (static::getTableAttribute()->exists() == true) {
+            static::getTableAttribute()->drop();
         }
     }
 
@@ -84,7 +84,7 @@ class Schemaless {
      * @return type
      */
     public static function getTableEntity() {
-        return self::getDatabase()->table(self::$tableEntity);
+        return static::getDatabase()->table(static::$tableEntity);
     }
 
     /**
@@ -92,7 +92,7 @@ class Schemaless {
      * @return type
      */
     public static function getTableAttribute() {
-        return self::getDatabase()->table(self::$tableAttribute);
+        return static::getDatabase()->table(static::$tableAttribute);
     }
 
     /**
@@ -111,22 +111,22 @@ class Schemaless {
         }
         $entityData['CreatedAt'] = date('Y-m-d H:i:s');
         $entityData['UpdatedAt'] = date('Y-m-d H:i:s');
-        self::getDatabase()->transactionBegin();
+        static::getDatabase()->transactionBegin();
         try {
-            $result = self::getTableEntity()->insert($entityData);
+            $result = static::getTableEntity()->insert($entityData);
             if ($result === false) {
                 throw new \RuntimeException('Create entity failed');
             }
             foreach ($attributesData as $key => $value) {
-                $result2 = self::setAttribute($entityData['Id'], $key, $value);
+                $result2 = static::setAttribute($entityData['Id'], $key, $value);
                 if ($result2 === false) {
                     throw new \RuntimeException('Create attribute failed');
                 }
             }
-            self::getDatabase()->transactionCommit();
-            return self::getEntity($entityData['Id']);
+            static::getDatabase()->transactionCommit();
+            return static::getEntity($entityData['Id']);
         } catch (\Exception $e) {
-            self::getDatabase()->transactionRollBack();
+            static::getDatabase()->transactionRollBack();
             echo $e->getMessage();
             return null;
         }
@@ -139,7 +139,7 @@ class Schemaless {
      */
     public static function getEntities($options = []) {
         $type = trim($options['Type'] ?? '');
-        $query = self::getTableEntity();
+        $query = static::getTableEntity();
         if ($type != '') {
             $query->where('Type', '=', $type);
         }
@@ -153,19 +153,19 @@ class Schemaless {
      * @return array
      */
     public static function getEntity($entityId) {
-        return self::getTableEntity()
+        return static::getTableEntity()
                         ->where('Id', '=', $entityId)
                         ->selectOne();
     }
 
     public static function getAttributes($entityId) {
-        return self::getTableAttribute()
+        return static::getTableAttribute()
                         ->where('EntityId', '=', $entityId)
                         ->select();
     }
 
     public static function getAttribute($entityId, $key) {
-        $attribute = self::getTableAttribute()
+        $attribute = static::getTableAttribute()
                 ->where('EntityId', '=', $entityId)
                 ->where('Key', '=', $key)
                 ->selectOne();
@@ -178,12 +178,12 @@ class Schemaless {
     }
 
     public static function setAttribute($entityId, $key, $value) {
-        $exists = self::getTableAttribute()
+        $exists = static::getTableAttribute()
                         ->where('EntityId', '=', $entityId)
                         ->where('Key', '=', $key)
                         ->numRows() > 0 ? true : false;
         if ($exists) {
-            return self::getTableAttribute()
+            return static::getTableAttribute()
                             ->where('EntityId', '=', $entityId)
                             ->where('Key', '=', $key)
                             ->update([
@@ -191,7 +191,7 @@ class Schemaless {
                                 'UpdatedAt' => date('Y-m-d'),
             ]);
         } else {
-            return self::getTableAttribute()->insert([
+            return static::getTableAttribute()->insert([
                         'Id' => \Sinevia\Uid::microUid(),
                         'EntityId' => $entityId,
                         'Key' => $key,
