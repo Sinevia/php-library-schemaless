@@ -47,12 +47,27 @@ class Schemaless {
         array("DeletedAt", "STRING"),
     );
 
+    /**
+     * Creates the storage tables
+     */
     public static function createTables() {
         if (self::getTableEntity()->exists() == false) {
             self::getTableEntity()->create(self::$tableEntitySchema);
         }
         if (self::getTableAttribute()->exists() == false) {
             self::getTableAttribute()->create(self::$tableAttributeSchema);
+        }
+    }
+    
+    /**
+     * Deletes the storage tables
+     */
+    public static function deleteTables() {
+        if (self::getTableEntity()->exists() == true) {
+            self::getTableEntity()->drop();
+        }
+        if (self::getTableAttribute()->exists() == true) {
+            self::getTableAttribute()->drop();
         }
     }
 
@@ -140,7 +155,7 @@ class Schemaless {
     public static function getEntity($entityId) {
         return self::getTableEntity()
                         ->where('Id', '=', $entityId)
-                        ->select();
+                        ->selectOne();
     }
 
     public static function getAttributes($entityId) {
