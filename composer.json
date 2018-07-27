@@ -1,0 +1,21 @@
+{
+    "name": "sinevia/php-library-schemaless",
+    "description": "PHP Library Schemaless",
+    "type": "library",
+    "keywords": ["schemaless", "library", "php", "sinevia"],    
+    "homepage": "http://github.com/sinevia/php-library-schemaless",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Milan Lesichkov",
+            "email": "lesichkovm@gmail.com",
+            "homepage": "http://lesichkov.co.uk",
+            "role": "Lead Developer"
+        }
+    ],
+    "autoload": {
+        "files": [
+            "src/Schemaless.php"
+        ]
+    }
+}
