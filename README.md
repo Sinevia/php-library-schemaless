@@ -1,6 +1,8 @@
 # Schemaless
 
-Work in progress. Not stable in any way
+Beware. Work in progress. Subject to change
+
+A streamlined entity-attribute-value (EAV) implementation for PHP. This package is designed for quick plug and play "schemaless" prototyping. To achieve this the package uses only two database tables unlike the standard EAV (which uses at least three tables).
 
 ## Install
 
@@ -58,4 +60,28 @@ var_dump(\Sinevia\Schemaless::getAttribute($entity['Id'],'LastName'));
    
 ```     
 
+## Table Schema ##
 
+The following schema is used for the database.
+
+| Entity    |                  |
+|-----------|------------------|
+| Id        | String, UniqueId |
+| Status    | String           |
+| Type      | String           |
+| ParentId  | String, UniqueId |
+| Sequence  | Integer          |
+| Name      | String           |
+| CreatedAt | DateTime         |
+| DeletedAt | DateTime         |
+| Udated At | DateTime         |
+
+| Field     |                  |
+|-----------|------------------|
+| Id        | String, UniqueId |
+| EntityId  | String, UniqueId |
+| Key       | String           |
+| Value     | JSON Text (Long) |
+| CreatedAt | DateTime         |
+| DeletedAt | DateTime         |
+| UpdatedAt | DateTime         |
