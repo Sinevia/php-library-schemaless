@@ -150,6 +150,7 @@ class Schemaless {
         $limitTo = (int) ($options['limitTo'] ?? 10);
         $wheres = ($options['wheres'] ?? []);
         $withAttributes = (float) ($options['withAttributes'] ?? false);
+        $withSoftDeletes = (float) ($options['withSoftDeletes'] ?? true);
 
         $query = static::getTableEntity();
 
@@ -159,6 +160,10 @@ class Schemaless {
 
         if ($isActive != '') {
             $query->where('IsActive', '=', $isActive);
+        }
+        
+        if ($withSoftDeletes == false) {
+            $query->where(static::$tableEntity . '.DeletedAt', '=', NULL);
         }
 
         $alliases = [];
@@ -172,7 +177,7 @@ class Schemaless {
 
                 $alias = 'Alias' . uniqid();
                 $query->join(static::$tableAttribute, 'Id', 'EntityId', 'LEFT', $alias);
-                $query->whereRaw(' AND (' . $alias . '.Key = ' . static::getDatabase()->quote(substr($where[0], 10)).' AND ' . $alias . '.Value' . ' ' . $where[1] . ' ' . static::getDatabase()->quote(static::attributeValueEncode($where[2])).' )');
+                $query->whereRaw(' AND (' . $alias . '.Key = ' . static::getDatabase()->quote(substr($where[0], 10)) . ' AND ' . $alias . '.Value' . ' ' . $where[1] . ' ' . static::getDatabase()->quote(static::attributeValueEncode($where[2])) . ' )');
             }
         }
 
@@ -180,11 +185,12 @@ class Schemaless {
 
         $selectFields = $alliases;
         $entities = $query->select(
-                static::$tableEntity . '.Id,' .
-                static::$tableEntity . '.Type,' .
-                static::$tableEntity . '.Title,' .
-                static::$tableEntity . '.CreatedAt,' .
-                static::$tableEntity . '.UpdatedAt'
+                static::$tableEntity . '.Id, ' .
+                static::$tableEntity . '.Type, ' .
+                static::$tableEntity . '.Title, ' .
+                static::$tableEntity . '.CreatedAt, ' .
+                static::$tableEntity . '.UpdatedAt, ' .
+                static::$tableEntity . '.DeletedAt'
                 //static::$tableAttribute.'.*'
         );
 
