@@ -81,7 +81,7 @@ if (is_null($person)) {
 ]);
 ```
 
-3. Get/retrieve entities
+3. Get entities
 
 ```php
 // 1. Retrieve entity by Id
@@ -90,7 +90,7 @@ var_dump($person);
 
 
 // 2. Retrieve entities by search
-$people = MySchemaless::getEntities([
+$people = \Sinevia\Schemaless::getEntities([
     'Type' => 'Person',
     'IsActive' => 'Yes',
     'limitFrom' => 0,
@@ -108,6 +108,17 @@ $people = MySchemaless::getEntities([
 
 var_dump($people);
 
+```
+
+4. Get attributes
+
+```php
+// 1. Retrieve and display entity attributes
+echo \Sinevia\Schemaless::getAttribute($personId, 'AddressLine1');
+echo \Sinevia\Schemaless::getAttribute($personId, 'AddressLine2');
+
+// 2. Get all atributes at once
+$attributes = \Sinevia\Schemaless::getAttributes($personId);
 ```
      
 
