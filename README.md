@@ -160,3 +160,20 @@ The following schema is used for the database.
 | CreatedAt | DateTime         |
 | DeletedAt | DateTime         |
 | UpdatedAt | DateTime         |
+
+## Extend
+
+One can easily extend the default schemaless class, and create his own version. See the example below which custome table names.
+
+```php
+class MySchemaless extends Sinevia\Schemaless {
+    public static $tableEntity = 'my_schemaless_entity';
+    public static $tableAttribute = 'my_schemaless_attribute';
+
+}
+
+$page = MySchemaless::createEntity([
+    'Type'=>'Page',
+    'Title'=>'Home Page'
+]);
+```
