@@ -1,7 +1,5 @@
 # Schemaless
 
-Note. Work in progress. Subject to change
-
 A streamlined entity-attribute (EA) implementation for PHP. This package is designed for quick plug and play "schemaless" prototyping. To achieve this the package uses only two database tables unlike the standard EAV (which uses at least three tables).
 
 ## Install
