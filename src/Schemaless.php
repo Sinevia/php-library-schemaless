@@ -1,6 +1,6 @@
 <?php
 
-namespace Sinevia;
+namespace App;
 
 class Schemaless {
 
@@ -139,6 +139,33 @@ class Schemaless {
     }
 
     /**
+     * Deletes an entity together with all attributes
+     * @param string $entityId
+     * @return bool true on success, false otherwise
+     * @throws \RuntimeException
+     */
+    public static function deleteEntity($entityId) {
+        static::getDatabase()->transactionBegin();
+
+        try {
+            static::getTableAttribute()
+                    ->where('EntityId', '=', $entityId)
+                    ->delete();
+            static::getTableEntity()
+                    ->where('Id', '=', $entityId)
+                    ->delete();
+
+
+            static::getDatabase()->transactionCommit();
+            return true;
+        } catch (\Exception $e) {
+            static::getDatabase()->transactionRollBack();
+            echo $e->getMessage();
+            return false;
+        }
+    }
+
+    /**
      * Retrieves entities
      * @param array $options
      * @return array
@@ -150,7 +177,7 @@ class Schemaless {
         $limitTo = (int) ($options['limitTo'] ?? 10);
         $wheres = ($options['wheres'] ?? []);
         $withAttributes = (float) ($options['withAttributes'] ?? false);
-        $withSoftDeletes = (float) ($options['withSoftDeletes'] ?? true);
+        $withSoftDeleted = (float) ($options['withSoftDeleted'] ?? true);
 
         $query = static::getTableEntity();
 
@@ -161,8 +188,8 @@ class Schemaless {
         if ($isActive != '') {
             $query->where('IsActive', '=', $isActive);
         }
-        
-        if ($withSoftDeletes == false) {
+
+        if ($withSoftDeleted == false) {
             $query->where(static::$tableEntity . '.DeletedAt', '=', NULL);
         }
 
@@ -227,6 +254,19 @@ class Schemaless {
         }
 
         return $attributes;
+    }
+
+    public static function deleteAttribute($entityId, $key) {
+        $result = static::getTableAttribute()
+                ->where('EntityId', '=', $entityId)
+                ->where('Key', '=', $key)
+                ->delete();
+
+        if ($result !== false) {
+            return true;
+        }
+
+        return false;
     }
 
     public static function getAttribute($entityId, $key) {
