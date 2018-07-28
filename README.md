@@ -120,7 +120,20 @@ echo \Sinevia\Schemaless::getAttribute($personId, 'AddressLine2');
 // 2. Get all atributes at once
 $attributes = \Sinevia\Schemaless::getAttributes($personId);
 ```
-     
+
+5. Delete entity
+
+```php
+$isDeleted = \Sinevia\Schemaless::deleteEntity($personId);
+```
+
+6. Delete attribute
+
+```php
+$isDeleted = \Sinevia\Schemaless::deleteAttribute($personId,'AddressLine1');
+```
+
+
 
 ## Table Schema ##
 
