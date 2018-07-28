@@ -223,7 +223,7 @@ class Schemaless {
 
         if ($withAttributes == true) {
             foreach ($entities as $index => $entity) {
-                $entity['attributes'] = static::getAttributes($entity['Id']);
+                $entity['Attributes'] = static::getAttributes($entity['Id']);
                 $entities[$index] = $entity;
             }
         }
@@ -236,10 +236,19 @@ class Schemaless {
      * @param string $entityId
      * @return array
      */
-    public static function getEntity($entityId) {
-        return static::getTableEntity()
-                        ->where('Id', '=', $entityId)
-                        ->selectOne();
+    public static function getEntity($entityId, $options = []) {
+        $withAttributes = (float) ($options['withAttributes'] ?? false);
+        $withSoftDeleted = (float) ($options['withSoftDeleted'] ?? true);
+
+        $entity = static::getTableEntity()
+                ->where('Id', '=', $entityId)
+                ->selectOne();
+
+        if ($withAttributes == true) {
+            $entity['Attributes'] = static::getAttributes($entity['Id']);
+        }
+
+        return $entity;
     }
 
     public static function getAttributes($entityId) {
@@ -327,6 +336,40 @@ class Schemaless {
         } catch (\Exception $e) {
             static::getDatabase()->transactionRollBack();
             //echo $e->getMessage();
+            return false;
+        }
+    }
+
+    /**
+     * Updates a new entity and returns it
+     * @param array $entityData
+     * @param array $attributesData
+     * @return array|null
+     * @throws \RuntimeException
+     */
+    public static function updateEntity($entityId, $entityData, $attributesData = []) {
+        $entityData['UpdatedAt'] = date('Y-m-d H:i:s');
+
+        static::getDatabase()->transactionBegin();
+
+        try {
+            $result = static::getTableEntity()
+                    ->where('Id', '=', $entityId)
+                    ->update($entityData);
+            if ($result === false) {
+                throw new \RuntimeException('Create entity failed');
+            }
+            foreach ($attributesData as $key => $value) {
+                $result2 = static::setAttribute($entityId, $key, $value);
+                if ($result2 === false) {
+                    throw new \RuntimeException('Creating "' . $key . '" attribute failed');
+                }
+            }
+            static::getDatabase()->transactionCommit();
+            return true;
+        } catch (\Exception $e) {
+            static::getDatabase()->transactionRollBack();
+            echo $e->getMessage();
             return false;
         }
     }
