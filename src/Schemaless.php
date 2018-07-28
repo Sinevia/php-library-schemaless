@@ -9,7 +9,7 @@ class Schemaless {
      * @var string
      */
     public static $tableEntity = 'snv_schemaless_entity';
-    
+
     /**
      * The table schema for entities
      * @var array
@@ -26,13 +26,13 @@ class Schemaless {
         array("UpdatedAt", "STRING"),
         array("DeletedAt", "STRING"),
     );
-    
+
     /**
      * The table name for attributes
      * @var string
      */
     public static $tableAttribute = 'snv_schemaless_attribute';
-    
+
     /**
      * The table schema for attributes
      * @var array
@@ -58,7 +58,7 @@ class Schemaless {
             static::getTableAttribute()->create(static::$tableAttributeSchema);
         }
     }
-    
+
     /**
      * Deletes the storage tables
      */
@@ -103,15 +103,21 @@ class Schemaless {
      * @throws \RuntimeException
      */
     public static function createEntity($entityData, $attributesData = []) {
+        // Set "Id" if not predefined
         if (isset($entityData['Id']) == false) {
             $entityData['Id'] = \Sinevia\Uid::microUid();
         }
+
+        // Set "IsActive" if not predefined
         if (isset($entityData['IsActive']) == false) {
-            $entityData['IsActive'] = 'No';
+            $entityData['IsActive'] = 'Yes';
         }
+
         $entityData['CreatedAt'] = date('Y-m-d H:i:s');
         $entityData['UpdatedAt'] = date('Y-m-d H:i:s');
+
         static::getDatabase()->transactionBegin();
+
         try {
             $result = static::getTableEntity()->insert($entityData);
             if ($result === false) {
@@ -120,7 +126,7 @@ class Schemaless {
             foreach ($attributesData as $key => $value) {
                 $result2 = static::setAttribute($entityData['Id'], $key, $value);
                 if ($result2 === false) {
-                    throw new \RuntimeException('Create attribute failed');
+                    throw new \RuntimeException('Creating "' . $key . '" attribute failed');
                 }
             }
             static::getDatabase()->transactionCommit();
@@ -139,11 +145,56 @@ class Schemaless {
      */
     public static function getEntities($options = []) {
         $type = trim($options['Type'] ?? '');
+        $isActive = trim($options['IsActive'] ?? '');
+        $limitFrom = (int) ($options['limitFrom'] ?? 0);
+        $limitTo = (int) ($options['limitTo'] ?? 10);
+        $wheres = ($options['wheres'] ?? []);
+        $withAttributes = (float) ($options['withAttributes'] ?? false);
+
         $query = static::getTableEntity();
+
         if ($type != '') {
             $query->where('Type', '=', $type);
         }
-        $entities = $query->select();
+
+        if ($isActive != '') {
+            $query->where('IsActive', '=', $isActive);
+        }
+
+        $alliases = [];
+
+        foreach ($wheres as $where) {
+            if (is_array($where)) {
+                if (substr($where[0], 0, 10) != 'Attribute_') {
+                    $query->whereRaw(' AND ' . static::$tableEntity . '.' . $where[0] . ' ' . $where[1] . ' ' . static::getDatabase()->quote($where[2]));
+                    continue;
+                }
+
+                $alias = 'Alias' . uniqid();
+                $query->join(static::$tableAttribute, 'Id', 'EntityId', 'LEFT', $alias);
+                $query->whereRaw(' AND (' . $alias . '.Key = ' . static::getDatabase()->quote(substr($where[0], 10)).' AND ' . $alias . '.Value' . ' ' . $where[1] . ' ' . static::getDatabase()->quote(static::attributeValueEncode($where[2])).' )');
+            }
+        }
+
+        $query->limit($limitFrom, $limitTo);
+
+        $selectFields = $alliases;
+        $entities = $query->select(
+                static::$tableEntity . '.Id,' .
+                static::$tableEntity . '.Type,' .
+                static::$tableEntity . '.Title,' .
+                static::$tableEntity . '.CreatedAt,' .
+                static::$tableEntity . '.UpdatedAt'
+                //static::$tableAttribute.'.*'
+        );
+
+        if ($withAttributes == true) {
+            foreach ($entities as $index => $entity) {
+                $entity['attributes'] = static::getAttributes($entity['Id']);
+                $entities[$index] = $entity;
+            }
+        }
+
         return $entities;
     }
 
@@ -159,9 +210,17 @@ class Schemaless {
     }
 
     public static function getAttributes($entityId) {
-        return static::getTableAttribute()
-                        ->where('EntityId', '=', $entityId)
-                        ->select();
+        $attributeRows = static::getTableAttribute()
+                ->where('EntityId', '=', $entityId)
+                ->select();
+
+        $attributes = [];
+
+        foreach ($attributeRows as $attributeRow) {
+            $attributes[$attributeRow['Key']] = static::attributeValueDecode($attributeRow['Value']);
+        }
+
+        return $attributes;
     }
 
     public static function getAttribute($entityId, $key) {
@@ -183,22 +242,46 @@ class Schemaless {
                         ->where('Key', '=', $key)
                         ->numRows() > 0 ? true : false;
         if ($exists) {
-            return static::getTableAttribute()
-                            ->where('EntityId', '=', $entityId)
-                            ->where('Key', '=', $key)
-                            ->update([
-                                'Value' => static::attributeValueEncode($value),
-                                'UpdatedAt' => date('Y-m-d'),
+            $result = static::getTableAttribute()
+                    ->where('EntityId', '=', $entityId)
+                    ->where('Key', '=', $key)
+                    ->update([
+                'Value' => static::attributeValueEncode($value),
+                'UpdatedAt' => date('Y-m-d'),
             ]);
         } else {
-            return static::getTableAttribute()->insert([
-                        'Id' => \Sinevia\Uid::microUid(),
-                        'EntityId' => $entityId,
-                        'Key' => $key,
-                        'Value' => static::attributeValueEncode($value),
-                        'CreatedAt' => date('Y-m-d'),
-                        'UpdatedAt' => date('Y-m-d'),
+            $result = static::getTableAttribute()->insert([
+                'Id' => \Sinevia\Uid::microUid(),
+                'EntityId' => $entityId,
+                'Key' => $key,
+                'Value' => static::attributeValueEncode($value),
+                'CreatedAt' => date('Y-m-d'),
+                'UpdatedAt' => date('Y-m-d'),
             ]);
+        }
+
+        if ($result !== false) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static function setAttributes($entityId, $attributes) {
+        static::getDatabase()->transactionBegin();
+        try {
+            foreach ($attributes as $key => $value) {
+                $result2 = static::setAttribute($entityId, $key, $value);
+                if ($result2 === false) {
+                    throw new \RuntimeException('Creating attribute "' . $key . '" failed');
+                }
+            }
+            static::getDatabase()->transactionCommit();
+            return true;
+        } catch (\Exception $e) {
+            static::getDatabase()->transactionRollBack();
+            //echo $e->getMessage();
+            return false;
         }
     }
 
