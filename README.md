@@ -88,6 +88,10 @@ if (is_null($person)) {
 $person = \Sinevia\Schemaless::getEntity($personId);
 var_dump($person);
 
+// 1. Retrieve entity by Id with Attributes
+$person = \Sinevia\Schemaless::getEntity($personId, ['withAttributes' => true]);
+var_dump($person);
+
 
 // 2. Retrieve entities by search
 $people = \Sinevia\Schemaless::getEntities([
@@ -120,14 +124,37 @@ echo \Sinevia\Schemaless::getAttribute($personId, 'AddressLine2');
 // 2. Get all atributes at once
 $attributes = \Sinevia\Schemaless::getAttributes($personId);
 ```
+5. Update entity
 
-5. Delete entity
+```php
+// 1. Update entity by Id
+\Sinevia\Schemaless::updateEntity($personId,[
+    'Title' => 'Updated'
+]);
+
+// 2. Update entity by Id with Attributes
+\Sinevia\Schemaless::updateEntity($personId,[
+    'Title' => 'Updated'
+],[
+    'Postcode' => 'New Postcode';
+]);
+
+```
+
+6. Update attribute
+
+```php
+$isDeleted = \Sinevia\Schemaless::setAttribute($personId,'AddressLine1','Updated Address 1');
+```
+
+
+7. Delete entity
 
 ```php
 $isDeleted = \Sinevia\Schemaless::deleteEntity($personId);
 ```
 
-6. Delete attribute
+8. Delete attribute
 
 ```php
 $isDeleted = \Sinevia\Schemaless::deleteAttribute($personId,'AddressLine1');
