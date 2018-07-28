@@ -28,9 +28,25 @@ Delete storage tables
 
 ## How to Use?
 
+1. Creating new entities
+
 ```php
-// 1. Create entity with attributes
-$entity = \Sinevia\Schemaless::createEntity([
+// 1. Create new person
+$person = \Sinevia\Schemaless::createEntity([
+    'Type' => 'Person',
+    'Title' => 'Peter Pan'
+]);
+
+// 2. Check if successful
+if (is_null($person)) {
+    die('Entity failed to be created');
+} else {
+    echo 'New entity created with Id '.$person['Id']);
+    var_dump($person);
+}
+
+// 3. Create new person with attributes
+$person = \Sinevia\Schemaless::createEntity([
     'Type' => 'Person',
     'Title' => 'Peter Pan',
         ], [
@@ -42,27 +58,58 @@ $entity = \Sinevia\Schemaless::createEntity([
     'Country' => 'WW',    
 ]);
 
-// 2. Check if successful
-if (is_null($entity)) {
+// 4. Check if successful
+if (is_null($person)) {
     die('Entity failed to be created');
+} else {
+    echo 'New entity created with Id '.$person['Id']);
+    var_dump($person);
 }
 
-// 3. Retrieve and display entity
-var_dump(\Sinevia\Schemaless::getEntity($entity['Id']));
+```
+2. Set attributes
 
-// 4. Retrieve and display entity attributes
-echo \Sinevia\Schemaless::getAttribute($entity['Id'],'AddressLine1');
-echo \Sinevia\Schemaless::getAttribute($entity['Id'],'AddressLine2');
+```php
+// 1. Add attributes individually
+\Sinevia\Schemaless::setAttribute($personId, 'AddressLine1', '45 Queens Road');
+\Sinevia\Schemaless::setAttribute($personId, 'AddressLine2', 'Foxes Layer');
 
-// 5. Update entity attributes
-\Sinevia\Schemaless::setAttribute($entity['Id'], 'AddressLine1', '45 Queens Road');
-\Sinevia\Schemaless::setAttribute($entity['Id'], 'AddressLine2', 'Foxes Layer');
+// 2. Add many attributes at once
+\Sinevia\Schemaless::setAttributes($personId, [
+    'AddressLine1' => '122 Shepherds Close',
+    'AddressLine2' => 'Cows Barn',
+]);
+```
 
-// 6. Retrieve and display entity attributes
-echo \Sinevia\Schemaless::getAttribute($entity['Id'],'AddressLine1');
-echo \Sinevia\Schemaless::getAttribute($entity['Id'],'AddressLine2');
-   
-```     
+3. Get/retrieve entities
+
+```php
+// 1. Retrieve entity by Id
+$person = \Sinevia\Schemaless::getEntity($personId);
+var_dump($person);
+
+
+// 2. Retrieve entities by search
+$people = MySchemaless::getEntities([
+    'Type' => 'Person',
+    'IsActive' => 'Yes',
+    'limitFrom' => 0,
+    'limitTo' => 2,
+    // Advanced querying
+    'wheres' => [
+        ['CreatedAt', '>', '2018-07-27 22:24:10'],
+        ['CreatedAt', '<', '2018-07-27 23:31:50'],
+        ['Attribute_FirstName', '=', 'Peter'],
+        ['Attribute_LastName', 'LIKE', '%an%'],
+    ],
+    // Should returned entities contain also the attributes
+    'withAttributes' => true,
+]);
+
+var_dump($people);
+
+```
+     
 
 ## Table Schema ##
 
