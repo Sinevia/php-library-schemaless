@@ -1,5 +1,13 @@
 # Schemaless
 
+[![Latest Stable Version](https://poser.pugx.org/sinevia/php-library-schemaless/v/stable)](https://packagist.org/packages/sinevia/php-library-schemaless)
+[![Total Downloads](https://poser.pugx.org/sinevia/php-library-schemaless/downloads)](https://packagist.org/packages/sinevia/php-library-schemaless)
+[![Latest Unstable Version](https://poser.pugx.org/sinevia/php-library-schemaless/v/unstable)](https://packagist.org/packages/sinevia/php-library-schemaless)
+[![License](https://poser.pugx.org/sinevia/php-library-schemaless/license)](https://packagist.org/packages/sinevia/php-library-schemaless)
+[![Monthly Downloads](https://poser.pugx.org/sinevia/php-library-schemaless/d/monthly)](https://packagist.org/packages/sinevia/php-library-schemaless)
+[![Daily Downloads](https://poser.pugx.org/sinevia/php-library-schemaless/d/daily)](https://packagist.org/packages/sinevia/php-library-schemaless)
+[![composer.lock](https://poser.pugx.org/sinevia/php-library-schemaless/composerlock)](https://packagist.org/packages/sinevia/php-library-schemaless)
+
 A streamlined entity-attribute (EA) implementation for PHP. This package is designed for quick plug and play "schemaless" prototyping. To achieve this the package uses only two database tables unlike the standard EAV (which uses at least three tables).
 
 ## Install
