@@ -24,6 +24,12 @@ class SchemalessDataObjectRepository {
         return Sinevia\Schemaless::updateEntity($object->getId(), $entityData, $attributeDate);
     }
     
+    public static hydrateObject($object, array $data){
+        $data = self::flattenArrayWithDashes($data);
+        $object->data = $data;
+        return $card;
+    }
+    
     protected static function flattenArrayWithDashes(array $array) {
         $ritit = new RecursiveIteratorIterator(new RecursiveArrayIterator($array));
         $result = array();
