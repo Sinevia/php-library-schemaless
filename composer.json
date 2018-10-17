@@ -15,7 +15,9 @@
     ],
     "autoload": {
         "files": [
-            "src/Schemaless.php"
+            "src/Schemaless.php",
+            "src/SchemalessDataObject.php"
+            "src/SchemalessDataObjectRepository.php"
         ]
     }
 }
