@@ -1,3 +1,7 @@
+<?php
+
+namespace Sinevia;
+
 if (class_exists('\Sinevia\DataObject')) {
 
   class SchemalessDataObject extends Sinevia\DataObject {
