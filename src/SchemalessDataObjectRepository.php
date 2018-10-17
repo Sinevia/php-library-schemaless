@@ -23,5 +23,18 @@ class SchemalessDataObjectRepository {
         }
         return Sinevia\Schemaless::updateEntity($object->getId(), $entityData, $attributeDate);
     }
+    
+    protected static function flattenArrayWithDashes(array $array) {
+        $ritit = new RecursiveIteratorIterator(new RecursiveArrayIterator($array));
+        $result = array();
+        foreach ($ritit as $leafValue) {
+            $keys = array();
+            foreach (range(0, $ritit->getDepth()) as $depth) {
+                $keys[] = $ritit->getSubIterator($depth)->key();
+            }
+            $result[join('_', $keys)] = $leafValue;
+        }
+        return $result;
+    }
 
 }
