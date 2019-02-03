@@ -4,7 +4,12 @@ namespace Sinevia;
 
 class SchemalessDataObjectRepository {
 
-    public static function saveObject($object) {
+    /**
+     * Creates or updates an object
+     * @param SchemalessDataObject $object
+     * @return boolean true if successful, false otherwise
+     */
+    public static function saveObject(&$object) {
         $saveArray = $object->data_changed;
         $entityData = [];
         $attributeDate = [];
@@ -21,17 +26,38 @@ class SchemalessDataObjectRepository {
                 $entityData[$key] = $value;
             }
         }
-        return Sinevia\Schemaless::updateEntity($object->getId(), $entityData, $attributeDate);
+
+        if (isset($entityData['Id']) == false) {
+            $result = \Sinevia\Schemaless::createEntity($entityData, $attributeDate);
+            if (is_array($result)) {
+                $object->setId($result['Id']);
+                return true;
+            }
+            return false;
+        }
+
+        return \Sinevia\Schemaless::updateEntity($object->getId(), $entityData, $attributeDate);
     }
-    
-    public static hydrateObject($object, array $data){
-        $data = self::flattenArrayWithDashes($data);
-        $object->data = $data;
-        return $card;
+
+    /**
+     * Hydrates an object with data
+     * @param type $object
+     * @param array $data
+     * @return type
+     */
+    public static function hydrateObject($object, array $data) {
+        $dataFlattened = self::flattenArrayWithDashes($data);
+        $object->data = $dataFlattened;
+        return $object;
     }
-    
+
+    /**
+     * Recursively flattens an array 
+     * @param array $array
+     * @return \App\Plugins\RecursiveIteratorIterator
+     */
     protected static function flattenArrayWithDashes(array $array) {
-        $ritit = new RecursiveIteratorIterator(new RecursiveArrayIterator($array));
+        $ritit = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($array));
         $result = array();
         foreach ($ritit as $leafValue) {
             $keys = array();
