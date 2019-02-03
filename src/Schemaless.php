@@ -315,7 +315,7 @@ class Schemaless {
                     ->where('Key', '=', $key)
                     ->update([
                 'Value' => static::attributeValueEncode($value),
-                'UpdatedAt' => date('Y-m-d'),
+                'UpdatedAt' => date('Y-m-d H:i:s'),
             ]);
         } else {
             $result = static::getTableAttribute()->insert([
@@ -323,8 +323,8 @@ class Schemaless {
                 'EntityId' => $entityId,
                 'Key' => $key,
                 'Value' => static::attributeValueEncode($value),
-                'CreatedAt' => date('Y-m-d'),
-                'UpdatedAt' => date('Y-m-d'),
+                'CreatedAt' => date('Y-m-d H:i:s'),
+                'UpdatedAt' => date('Y-m-d H:i:s'),
             ]);
         }
 
