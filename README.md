@@ -210,3 +210,84 @@ $page = MySchemaless::createEntity([
     'Title'=>'Home Page'
 ]);
 ```
+
+
+## Working with Objects ##
+
+Schemaless provides options to work with Objects instead of with Entities and Attributes. This is achieved with two helper classes - SchemalessDataObject and SchemalessDataObjectRepository.
+
+Note that being an abstraction it will be a bit slower as it will have to hydrate the data objects with data.
+
+### 1. Creating a Data Object Class ###
+
+```
+class Person extends SchemalessDataObject {
+
+    const TYPE = 'Person';
+
+    function __construct() {
+        $this->setType(self::TYPE);
+    }
+
+    public function getEmail() {
+        return $this->getAttribute('Email');
+    }
+
+    public function setEmail($email) {
+        $this->setAttribute("Email", $email);
+    }
+
+}
+```
+
+### 2. Creating a Data Object Reository ###
+
+```
+class PersonRepository extends SchemalessDataObjectRepository {
+
+    public static function findPersonByEmail($email) {
+        $entities = \Sinevia\Schemaless::getEntities([
+                    'Type' => Person::TYPE,
+                    'limitFrom' => 0,
+                    'limitTo' => 1,
+                    'wheres' => [
+                        ['Attribute_Email', '=', $email]
+                    ],
+                    'withAttributes' => true,
+        ]);
+
+        if (count($entities) < 1) {
+            return null;
+        }
+
+        $person = new Person;
+        self::hydrateObject($user, $entities[0]);
+        return $person;
+    }
+    
+}
+```
+
+### 3. How to Use ###
+
+```
+// Creating a new object
+
+$person = new Person;
+$person->setEmail('sam@example.com');
+$isSaved = Person::saveObject($person);
+if($isSaved){
+    echo $person->getId();
+}
+
+```
+
+```
+// Finding an object
+
+$person = Person::findByEmail('sam@example.com');
+if(is_null($person)){
+    echo $person->getEmail();
+}
+
+```
