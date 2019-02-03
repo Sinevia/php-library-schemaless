@@ -4,74 +4,83 @@ namespace Sinevia;
 
 if (class_exists('\Sinevia\DataObject')) {
 
-  class SchemalessDataObject extends Sinevia\DataObject {
+  class SchemalessDataObject extends \Sinevia\DataObject {
 
-      function getId() {
-          return $this->get('Id');
+      public function getId() {
+          if ($this->has('Id')) {
+              return $this->get('Id');
+          }
+          return null;
       }
 
-      function getType() {
+      public function getType() {
           return $this->get('Type');
       }
 
-      function getParentId() {
+      public function getParentId() {
           return $this->get('ParentId');
       }
 
-      function getSequence() {
+      public function getSequence() {
           return $this->get('Sequence');
       }
 
-      function getDescription() {
+      public function getDescription() {
           return $this->get('Description');
       }
 
-      function getCreatedAt() {
+      public function getCreatedAt() {
           return $this->get('CreatedAt');
       }
 
-      function getDeletedAt() {
+      public function getDeletedAt() {
           return $this->get('DeletedAt');
       }
 
-      function getUpdatedAt() {
+      public function getUpdatedAt() {
           return $this->get('UpdatedAt');
       }
 
-      function setType($type) {
+      public function setId($id) {
+          return $this->set('Id', $id);
+      }
+
+      public function setType($type) {
           return $this->set('Type', $type);
       }
 
-      function setParentId($parentId) {
+      public function setParentId($parentId) {
           return $this->set('ParentId', $parentId);
       }
 
-      function setSequence($sequence) {
+      public function setSequence($sequence) {
           return $this->set('Sequence', $sequence);
       }
 
-      function setDescription($description) {
+      public function setDescription($description) {
           return $this->set('Description', $description);
       }
 
-      function setCreatedAt($createdAt) {
+      public function setCreatedAt($createdAt) {
           return $this->set('CreatedAt', $createdAt);
       }
 
-      function setDeletedAt($deletedAt) {
+      public function setDeletedAt($deletedAt) {
           return $this->set('DeletedAt', $deletedAt);
       }
 
-      function setUpdatedAt($updatedAt) {
+      public function setUpdatedAt($updatedAt) {
           return $this->set('UpdatedAt', $updatedAt);
       }
 
       protected function getAttribute($key) {
-          return $this->get('Attribute_' . $key);
+          return $this->get('Attributes_' . $key);
       }
 
       protected function setAttribute($key, $value) {
-          return $this->set('Attribute_' . $key, $value);
+          return $this->set('Attributes_' . $key, $value);
       }
+
   }
+  
 }
